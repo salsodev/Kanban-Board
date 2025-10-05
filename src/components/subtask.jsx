@@ -1,5 +1,3 @@
-import React from "react";
-
 function Subtask({ subtaskFormField, id, formData, setFormData }) {
   function handleSubtaskForm(e, i) {
     const newSubtask = formData.subtasks.map((subtask) => {
@@ -12,7 +10,7 @@ function Subtask({ subtaskFormField, id, formData, setFormData }) {
         ...subtask,
       };
     });
-    newSubtask[i].description = e.target.value;
+    newSubtask[i].title = e.target.value;
 
     setFormData((prev) => ({
       ...prev,
@@ -44,7 +42,7 @@ function Subtask({ subtaskFormField, id, formData, setFormData }) {
             : "e.g what do you think?"
         }
         onChange={(e) => handleSubtaskForm(e, id)}
-        value={subtaskFormField.description}
+        value={subtaskFormField.title}
       />
       <span className="subtask_delete" onClick={() => handleDelete(id)}>
         X

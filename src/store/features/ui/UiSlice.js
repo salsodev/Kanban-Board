@@ -3,9 +3,9 @@ import { createSlice } from "@reduxjs/toolkit";
 const slice = createSlice({
   name: "ui",
   initialState: {
-    currentCategory: "",
+    currentCategory: {},
     theme: {
-      isSwitch: false,
+      isSwitch: true,
       lightTheme: "light",
     },
   },

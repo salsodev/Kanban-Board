@@ -1,13 +1,13 @@
 import DragNdDrop from "./DragNdDrop";
 
-function OngoingTab({ doingTodos, showViewTask }) {
+function InReviewTab({ inReviewTasks, showViewTask }) {
   const dragEvents = DragNdDrop();
 
   return (
     <section className="ongoing_container">
       <h4 className="indicator">
-        <span className="indicator_ongoing"></span> In Progress (
-        {doingTodos?.length ?? 0})
+        <span className="indicator_inreview"></span> In Review (
+        {inReviewTasks?.length ?? 0})
       </h4>
       <div
         className="ongoing"
@@ -15,7 +15,7 @@ function OngoingTab({ doingTodos, showViewTask }) {
         onDragLeave={(e) => dragEvents.todoDragLeave(e)}
         onDrop={(e) => dragEvents.todoDrop(e)}
       >
-        {doingTodos?.map((doingTodo) => (
+        {inReviewTasks?.map((doingTodo) => (
           <div
             className="ongoing_box"
             key={doingTodo.id}
@@ -40,4 +40,4 @@ function OngoingTab({ doingTodos, showViewTask }) {
   );
 }
 
-export default OngoingTab;
+export default InReviewTab;

@@ -105,19 +105,6 @@ export const getCategoryTodos = (todo, categoryID) => {
   return todo.filter((td) => td.categoryID === categoryID);
 };
 
-export const getTodoByStatus = (todos, status) =>
-  todos.filter((todo) => todo.status === status);
-
-export const getSubtaskResolved = (todo) => {
-  let res = 0;
-  todo.subtasks.forEach((subtask) => {
-    if (subtask.completed) {
-      res += 1;
-    }
-  });
-  return res;
-};
-
 export const getTodoById = (todos, id) => {
   return todos.filter((todo) => todo.id === id);
 };

@@ -1,4 +1,3 @@
-import React from "react";
 import Category from "./category";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -6,12 +5,13 @@ import { BsFillMoonStarsFill } from "react-icons/bs";
 import { MdOutlineWbSunny } from "react-icons/md";
 import { BsEyeSlash } from "react-icons/bs";
 import { switchThemeButtonClick } from "../../store/features/ui/UiSlice";
+import { useGetProjects } from "../../api/hook/project";
 
 function SideBar({ isClickDroppable, setIsClickDroppable, screenWidth }) {
   const dispatch = useDispatch();
-  const categories = useSelector((state) => state.entities.categories);
-  const theme = useSelector((state) => state.entities.ui.theme);
+  const { data } = useGetProjects();
 
+  const theme = useSelector((state) => state.entities.ui.theme);
   let res = "";
 
   if (screenWidth <= 760) {
@@ -28,9 +28,10 @@ function SideBar({ isClickDroppable, setIsClickDroppable, screenWidth }) {
             style={{ zIndex: 1000, borderRadius: "10px" }}
           >
             <h4>
-              All boards <span className="count">({categories.length})</span>
+              All boards{" "}
+              <span className="count">({data?.projects?.length ?? 0})</span>
             </h4>
-            <Category />
+            <Category data={data} />
             <footer>
               <div className="theme">
                 <MdOutlineWbSunny />
@@ -55,9 +56,10 @@ function SideBar({ isClickDroppable, setIsClickDroppable, screenWidth }) {
     res = (
       <aside className="sidebar">
         <h4>
-          All boards <span className="count">({categories.length})</span>
+          All boards{" "}
+          <span className="count">({data?.projects?.length ?? 0})</span>
         </h4>
-        <Category />
+        <Category data={data} />
         <footer>
           <div className="theme">
             <MdOutlineWbSunny />

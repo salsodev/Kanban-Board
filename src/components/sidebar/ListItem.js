@@ -1,22 +1,31 @@
-import React from "react";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
-import { getActiveCategory } from "../../store/features/filter/filterSlice";
-import { addActiveCategory } from "../../store/features/ui/UiSlice";
+import { useSelector } from "react-redux";
 
-function ListItem({ id, description, handleDeleteCategory }) {
-  const categories = useSelector((state) => state.entities.categories);
-  const dispatch = useDispatch();
-  const currCategory = getActiveCategory(categories, id);
+function ListItem({ payload, handleDeleteCategory, handleAddCurrentCategory }) {
+  const currProject = useSelector(
+    (state) => state.entities?.ui?.currentCategory
+  );
 
   return (
     <li
       className="category_list_item"
-      onClick={() => dispatch(addActiveCategory(currCategory))}
-      onDoubleClick={() => handleDeleteCategory(id)}
+      style={{
+        backgroundColor:
+          currProject?.id === payload?.id
+            ? "var(--clr-bg-main)"
+            : "transparent",
+        color:
+          currProject?.id === payload?.id
+            ? "var(--clr-primary-blue)"
+            : "inherit",
+        borderRadius:
+          currProject?.id === payload?.id ? "0 100px 100px 0" : "0px",
+      }}
+      onClick={() => handleAddCurrentCategory(payload)}
+      onDoubleClick={() => handleDeleteCategory(payload.id)}
     >
       <MdOutlineSpaceDashboard />
-      <span>{description}</span>
+      <span>{payload?.name}</span>
     </li>
   );
 }

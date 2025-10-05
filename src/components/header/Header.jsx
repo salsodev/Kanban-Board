@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
-import { todoRemoveAll } from "../../store/features/todo/todoSlice";
-import { categoryRemovedAll } from "../../store/features/filter/filterSlice";
+import { useQueryClient } from "react-query";
+import { useLogout } from "../../api/hook/auth";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useClearProjects } from "../../api/hook/project";
+import { toast } from "sonner";
 
 function Header({
   setIsNewTaskShow,
@@ -11,34 +14,20 @@ function Header({
   setIsClickDroppable,
   screenWidth,
 }) {
-  const dispatch = useDispatch();
-  const categories = useSelector((state) => state.entities.categories);
-
-  const [event, setEvent] = useState({
-    isClicked: false,
-    DeleteAll: () => {
-      // eslint-disable-next-line no-restricted-globals
-      const proceed = confirm(
-        "Are you sure you want to delete all your saved work?\nDo you wish to continue?"
-      );
-
-      if (proceed) {
-        dispatch(todoRemoveAll());
-        dispatch(categoryRemovedAll());
-        localStorage.removeItem("persist:root");
-      }
-    },
-  });
-
-  const currentCategoryItem = useSelector(
-    (state) => state.entities.ui.currentCategory
+  const { mutate, isSuccess } = useLogout();
+  const navigate = useNavigate();
+  const [menuClicked, setMenuClicked] = useState(false);
+  const currProject = useSelector(
+    (state) => state.entities?.ui?.currentCategory
   );
+  const { mutate: clearProjects } = useClearProjects(currProject?.id);
+  const data = useQueryClient().getQueryData(["projects"]);
 
   function handleAddTodoBtn() {
-    if (categories.length > 0) {
+    if (data?.projects?.length > 0) {
       setIsNewTaskShow((prev) => !prev);
     } else {
-      alert("Waiting for you to create a new board to proceed...");
+      toast.info("Create a new board to proceed...");
     }
   }
 
@@ -47,6 +36,15 @@ function Header({
       setIsClickDroppable((prev) => !prev);
     }
   };
+
+  const handleLogout = () => {
+    mutate();
+    setMenuClicked(false);
+  };
+
+  useEffect(() => {
+    if (isSuccess) navigate("/login");
+  }, [isSuccess, navigate]);
 
   return (
     <nav
@@ -72,9 +70,9 @@ function Header({
         className={`header_title ${isClickDroppable ? "rotate" : ""}`}
         onClick={handleCategoryPopUp}
       >
-        {categories.length > 0
-          ? currCategoryName(currentCategoryItem.description)
-          : "Emptied"}{" "}
+        {data?.projects?.length > 0
+          ? currCategoryName(currProject?.name)
+          : "Emptied"}
         <MdKeyboardArrowDown className="arr_down" />
       </h1>
       <div className="btn" onClick={() => handleAddTodoBtn()}>
@@ -90,13 +88,14 @@ function Header({
       </div>
       <BsThreeDotsVertical
         className="dots dot_pos"
-        onClick={() =>
-          setEvent((prev) => ({ ...prev, isClicked: !prev.isClicked }))
-        }
+        onClick={() => setMenuClicked((prev) => !prev)}
       />
-      {event.isClicked ? (
+      {menuClicked ? (
         <div className="delete_popup">
-          <span className="delete_all" onClick={event.DeleteAll}>
+          <button type="button" className="logout_btn" onClick={handleLogout}>
+            Log out
+          </button>
+          <span className="delete_all" onClick={() => clearProjects()}>
             Delete all
           </span>
         </div>

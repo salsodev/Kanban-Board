@@ -1,34 +1,37 @@
-import React, { useRef, useState } from "react";
-import {
-  getCategoryTodos,
-  getTodoByStatus,
-} from "../../store/features/todo/todoSlice";
-import { useSelector } from "react-redux";
+import { useRef, useState } from "react";
 import ViewTask from "../ViewTask";
-
 import CompleteTab from "./completeTab";
-// import NewColumn from "./NewColumn";
 import OngoingTab from "./OngoingTab";
 import TodoTab from "./todoTab";
 import NewTask from "../NewTask";
+import { useGetProjectTasks } from "../../api/hook/project";
+import { getTodoByStatus } from "../../utils/helpers";
+import InReviewTab from "./Inreview";
+import { useSelector } from "react-redux";
+import { useQueryClient } from "react-query";
 
 function Main({ setIsNewTaskShow, isNewTaskShow }) {
+  const queryClient = useQueryClient();
+  const currUser = queryClient.getQueryData("currentUser");
   const count = useRef(0); // get the current clicked todo
   const isEditClickREF = useRef(false); // determine whether to edit the current viewed todo
   const [isDoubleClicked, setIsDoubleClicked] = useState(false); // determine whether to view full detail of the current todo
 
-  const currentCategory = useSelector(
-    (state) => state.entities.ui.currentCategory
+  const currProject = useSelector(
+    (state) => state.entities?.ui?.currentCategory
   ); // Current clicked category from redux store
-  const todos = useSelector((state) => state.entities.todo); // Current todo from redux store
-  const todosByCategory = getCategoryTodos(todos, currentCategory.id); // get all todo by category from redux store
+  let projectTasks = useGetProjectTasks(currProject?.id); // get all todo by category from redux store
+  const taskDetail =
+    queryClient.getQueryData([["taskDetail"]]) ??
+    JSON.parse(localStorage.getItem("taskDetail"));
 
-  const currTodos = getTodoByStatus(todosByCategory, "todo");
-  const doingTodos = getTodoByStatus(todosByCategory, "doing");
-  const completedTodos = getTodoByStatus(todosByCategory, "done");
+  const currTasks = getTodoByStatus(projectTasks?.tasks, "todo");
+  const pendingTasks = getTodoByStatus(projectTasks?.tasks, "pending");
+  const inReviewTasks = getTodoByStatus(projectTasks?.tasks, "in review");
+  const completedTasks = getTodoByStatus(projectTasks?.tasks, "done");
 
   function showViewTask(id) {
-    count.current = todos.findIndex((todo) => todo.id === id);
+    count.current = projectTasks?.tasks?.findIndex((task) => task.id === id);
     setIsDoubleClicked((prev) => !prev);
   }
 
@@ -39,11 +42,31 @@ function Main({ setIsNewTaskShow, isNewTaskShow }) {
 
   return (
     <div className="main_overflow">
+      <div className="welcome">
+        <h2>
+          Welcome back,{" "}
+          {currUser?.username[0].toUpperCase() + currUser?.username.slice(1)}
+          👋
+        </h2>
+        <p
+          style={{
+            color: "var(--clr-text-gray)",
+            marginTop: "8px",
+            fontSize: "14px",
+          }}
+        >
+          Plan Smart. Execute Smooth.
+        </p>
+      </div>
       <div className="main">
-        <TodoTab currTodos={currTodos} showViewTask={showViewTask} />
-        <OngoingTab doingTodos={doingTodos} showViewTask={showViewTask} />
+        <TodoTab currTodos={currTasks} showViewTask={showViewTask} />
+        <OngoingTab doingTodos={pendingTasks} showViewTask={showViewTask} />
+        <InReviewTab
+          inReviewTasks={inReviewTasks}
+          showViewTask={showViewTask}
+        />
         <CompleteTab
-          completedTodos={completedTodos}
+          completedTodos={completedTasks}
           showViewTask={showViewTask}
         />
 
@@ -58,7 +81,7 @@ function Main({ setIsNewTaskShow, isNewTaskShow }) {
               setIsDoubleClicked={setIsDoubleClicked}
               setIsNewTaskShow={setIsNewTaskShow}
               setIsEditClickREF={isEditClickREF}
-              currTodo={todos[count.current]}
+              currTodo={projectTasks?.tasks[count.current]}
             />
           </>
         ) : (
@@ -73,18 +96,12 @@ function Main({ setIsNewTaskShow, isNewTaskShow }) {
               isEditClickREF={isEditClickREF.current}
               currTodo={
                 isEditClickREF.current
-                  ? todos[count.current]
+                  ? taskDetail
                   : {
                       title: "",
                       description: "",
-                      subtasks: [
-                        {
-                          description: "",
-                          completed: false,
-                        },
-                      ],
+                      subtasks: [],
                       status: "todo",
-                      categoryID: currentCategory.id,
                     }
               }
             />

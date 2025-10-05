@@ -1,19 +1,23 @@
-import React, { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { todoAdded, todoUpdate } from "../store/features/todo/todoSlice";
+import { useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import Subtask from "./subtask";
+import { useCreateProjectTask } from "../api/hook/project";
+import { useUpdateTaskWithSubtask } from "../api/hook/task";
 
 function NewTask({ currTodo, isEditClickREF, handleOverlay }) {
   const currentCategory = useSelector(
     (state) => state.entities.ui.currentCategory
   );
+  const { mutate, isLoading } = useCreateProjectTask(currentCategory.id);
+  const { mutate: updateTask, isLoading: isLoadingUpdateTask } =
+    useUpdateTaskWithSubtask(currentCategory.id);
+
   const ref = useRef({
     updateTitle: "Update Task",
     updateButton: "Save Changes",
   });
-  const dispatch = useDispatch();
 
-  const [formData, setFormData] = useState(currTodo);
+  const [formData, setFormData] = useState(currTodo?.task ?? currTodo);
 
   function addSubtaskForm() {
     setFormData((prev) => ({
@@ -21,37 +25,31 @@ function NewTask({ currTodo, isEditClickREF, handleOverlay }) {
       subtasks: [
         ...formData.subtasks,
         {
-          description: "",
-          completed: false,
+          title: "",
+          status: false,
         },
       ],
     }));
   }
 
-  function handleClick(id) {
+  function handleClick() {
+    if (formData.title.trim() === "" || formData.description.trim() === "")
+      return;
+
     if (isEditClickREF) {
-      dispatch(
-        todoUpdate({
-          ...formData,
-          id,
-        })
-      );
+      // update task function
+      updateTask({ payload: formData, taskID: formData.id });
       handleOverlay();
     } else {
-      dispatch(todoAdded(formData));
+      // add task function
+      mutate(formData);
     }
 
     setFormData({
       title: "",
       description: "",
-      subtasks: [
-        {
-          description: "",
-          completed: false,
-        },
-      ],
+      subtasks: [],
       status: "todo",
-      categoryID: currentCategory.id,
     });
   }
 
@@ -91,7 +89,7 @@ function NewTask({ currTodo, isEditClickREF, handleOverlay }) {
           <label>Subtasks</label>
           <div className="subtask">
             {/* SUbtask element added programmatically */}
-            {formData.subtasks.map((subtaskFormField, index) => (
+            {formData?.subtasks?.map((subtaskFormField, index) => (
               <Subtask
                 key={index + 1}
                 subtaskFormField={subtaskFormField}
@@ -114,9 +112,11 @@ function NewTask({ currTodo, isEditClickREF, handleOverlay }) {
               setFormData((prev) => ({ ...prev, status: e.target.value }))
             }
           >
-            <option value="todo">Todo</option>
-            <option value="doing">Doing</option>
-            <option value="done">Done</option>
+            {["todo", "pending", "in review", "done"].map((status) => (
+              <option key={status} value={status}>
+                {status[0].toUpperCase() + status.slice(1)}
+              </option>
+            ))}
           </select>
         </div>
         <button
@@ -124,7 +124,13 @@ function NewTask({ currTodo, isEditClickREF, handleOverlay }) {
           className="submit_btn"
           onClick={() => handleClick(currTodo.id)}
         >
-          {isEditClickREF ? ref.current.updateButton : "Create Task"}
+          {isEditClickREF
+            ? isLoadingUpdateTask
+              ? "Processing..."
+              : ref.current.updateButton
+            : isLoading
+            ? "Processing..."
+            : "Create Task"}
         </button>
       </form>
     </div>

@@ -7,6 +7,14 @@ import SideBar from "./components/sidebar/SideBar";
 import Logo from "./components/Logo";
 
 import "./App.css";
+import { QueryClient } from "react-query";
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    mutations: { retry: 1 },
+    queries: { retry: 1 },
+  },
+});
 
 function App() {
   const [isNewTaskShow, setIsNewTaskShow] = useState(false);

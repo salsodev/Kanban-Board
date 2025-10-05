@@ -1,5 +1,3 @@
-import React from "react";
-import { getSubtaskResolved } from "../../store/features/todo/todoSlice";
 import DragNdDrop from "./DragNdDrop";
 
 function CompleteTab({ completedTodos, showViewTask }) {
@@ -9,7 +7,7 @@ function CompleteTab({ completedTodos, showViewTask }) {
     <section className="complete_container">
       <h4 className="indicator">
         <span className="indicator_complete"></span> Done (
-        {completedTodos.length})
+        {completedTodos?.length ?? 0})
       </h4>
       <div
         className="complete"
@@ -17,7 +15,7 @@ function CompleteTab({ completedTodos, showViewTask }) {
         onDragLeave={(e) => dragEvents.todoDragLeave(e)}
         onDrop={(e) => dragEvents.todoDrop(e)}
       >
-        {completedTodos.map((completeTodo) => (
+        {completedTodos?.map((completeTodo) => (
           <div
             className="complete_box"
             key={completeTodo.id}
@@ -26,8 +24,8 @@ function CompleteTab({ completedTodos, showViewTask }) {
           >
             <h3 className="complete_title">{completeTodo.title}</h3>
             <div className="complete_subtasks">
-              {getSubtaskResolved(completeTodo)} of{" "}
-              {completeTodo.subtasks.length} subtasks
+              {completeTodo?.completed_subtasks} of{" "}
+              {completeTodo?.total_subtasks} subtasks
             </div>
           </div>
         ))}
