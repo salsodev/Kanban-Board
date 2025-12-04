@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useRegister } from "../../api/hook/auth";
+import { toast } from "sonner";
 
 export default function Register() {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -17,6 +18,7 @@ export default function Register() {
     e.preventDefault();
 
     if (!formData.password || !formData.username) {
+      toast.error("Username and password must not be emptied");
       return;
     }
 

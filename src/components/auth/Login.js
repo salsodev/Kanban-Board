@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLogin } from "../../api/hook/auth";
+import { toast } from "sonner";
 
 export default function Login() {
   const { mutate, isSuccess, isLoading } = useLogin();
@@ -17,6 +18,11 @@ export default function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
+
+    if (formData.username.trim() === "" || formData.password.trim() === "") {
+      toast.error("Username and password must not be emptied");
+      return;
+    }
 
     mutate(formData);
   };
