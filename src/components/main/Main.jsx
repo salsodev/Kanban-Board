@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ViewTask from "../ViewTask";
 import CompleteTab from "./completeTab";
 import OngoingTab from "./OngoingTab";
@@ -12,7 +12,9 @@ import { useQueryClient } from "react-query";
 
 function Main({ setIsNewTaskShow, isNewTaskShow }) {
   const queryClient = useQueryClient();
-  const currUser = queryClient.getQueryData("currentUser");
+  const currUser =
+    queryClient.getQueryData("currentUser") ??
+    JSON.parse(localStorage.getItem("currentUser"));
   const count = useRef(0); // get the current clicked todo
   const isEditClickREF = useRef(false); // determine whether to edit the current viewed todo
   const [isDoubleClicked, setIsDoubleClicked] = useState(false); // determine whether to view full detail of the current todo
@@ -39,6 +41,12 @@ function Main({ setIsNewTaskShow, isNewTaskShow }) {
     isEditClickREF.current = false;
     setIsNewTaskShow((prev) => !prev);
   }
+
+  useEffect(() => {
+    if (!currUser) {
+      queryClient.setQueryData(JSON.parse(localStorage.getItem("currentUser")));
+    }
+  }, [currUser]);
 
   return (
     <div className="main_overflow">

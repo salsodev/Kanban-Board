@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "react-query";
-import { login, logout, register } from "../service";
+import { isLoggedIn, login, logout, register } from "../service";
 import { toast } from "sonner";
 
 export const useRegister = () => {
@@ -45,4 +45,12 @@ export const useLogout = () => {
   });
 
   return { mutate, data, isSuccess };
+};
+
+export const useIsLoggedIn = () => {
+  const { data, mutate, isSuccess, isLoading } = useMutation({
+    mutationFn: isLoggedIn,
+  });
+
+  return { mutate, data, isSuccess, isLoading };
 };

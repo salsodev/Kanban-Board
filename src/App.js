@@ -8,6 +8,10 @@ import Logo from "./components/Logo";
 
 import "./App.css";
 import { QueryClient } from "react-query";
+import { api } from "./api/client";
+import { isLoggedIn } from "./api/service";
+import { useIsLoggedIn } from "./api/hook/auth";
+import { useNavigate, useNavigation } from "react-router-dom";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,10 +21,18 @@ export const queryClient = new QueryClient({
 });
 
 function App() {
+  const navigate = useNavigate();
   const [isNewTaskShow, setIsNewTaskShow] = useState(false);
   const theme = useSelector((state) => state.entities.ui.theme);
   const [isClickDroppable, setIsClickDroppable] = useState(false);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const { data, isSuccess, mutate, isLoading } = useIsLoggedIn();
+
+  useEffect(() => {
+    if (!data) {
+      navigate("/login");
+    }
+  }, [data]);
 
   useEffect(() => {
     function handleScreenChange() {
@@ -36,6 +48,8 @@ function App() {
       window.removeEventListener("resize", handleScreenChange);
     };
   }, [screenWidth]);
+
+  if (!data) return null; // render nothing until auth is checked
 
   return (
     <div className="App" data-theme={theme && theme.isSwitch ? "light" : ""}>

@@ -7,7 +7,7 @@ import CheckAuthStatus from "../components/auth/AuthLoader";
 export const routes = createBrowserRouter([
   {
     path: "/",
-    loader: () => CheckAuthStatus(queryClient),
+    // loader: () => CheckAuthStatus(queryClient),
     shouldRevalidate: true,
     Component: App,
   },
