@@ -49,7 +49,16 @@ function App() {
     };
   }, [screenWidth]);
 
-  if (!data) return null; // render nothing until auth is checked
+  if (!data) {
+    return (
+      <div className="loaderContainer">
+        <div className="loaderWrapper">
+          <div className="loader"></div>
+          <p className="shimmer-text">Processing...</p>
+        </div>
+      </div>
+    ); // render nothing until auth is checked
+  }
 
   return (
     <div className="App" data-theme={theme && theme.isSwitch ? "light" : ""}>
