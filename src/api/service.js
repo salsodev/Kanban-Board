@@ -33,7 +33,6 @@ export const logout = async () => {
 export const isLoggedIn = async () => {
   try {
     const resp = await api.post(`/auth/isLoggedin`);
-
     return resp.data;
   } catch (error) {
     throw error;

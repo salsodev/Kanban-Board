@@ -8,15 +8,13 @@ import Logo from "./components/Logo";
 
 import "./App.css";
 import { QueryClient } from "react-query";
-import { api } from "./api/client";
-import { isLoggedIn } from "./api/service";
 import { useIsLoggedIn } from "./api/hook/auth";
-import { useNavigate, useNavigation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
-    mutations: { retry: 1 },
-    queries: { retry: 1 },
+    mutations: { retry: 2 },
+    queries: { retry: 2 },
   },
 });
 
@@ -26,13 +24,13 @@ function App() {
   const theme = useSelector((state) => state.entities.ui.theme);
   const [isClickDroppable, setIsClickDroppable] = useState(false);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  const { data, isSuccess, mutate, isLoading } = useIsLoggedIn();
+  const { data: isLoggedin } = useIsLoggedIn();
 
   useEffect(() => {
-    if (!data) {
+    if (!isLoggedin) {
       navigate("/login");
     }
-  }, [data]);
+  }, [isLoggedin, navigate]);
 
   useEffect(() => {
     function handleScreenChange() {
@@ -49,7 +47,7 @@ function App() {
     };
   }, [screenWidth]);
 
-  if (!data) {
+  if (!isLoggedin) {
     return (
       <div className="loaderContainer">
         <div className="loaderWrapper">

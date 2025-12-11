@@ -50,7 +50,12 @@ export const useLogout = () => {
 export const useIsLoggedIn = () => {
   const { data, mutate, isSuccess, isLoading } = useMutation({
     mutationFn: isLoggedIn,
+    onSuccess: (data) => {
+      console.log("inside: ", data);
+    },
   });
+
+  console.log(data);
 
   return { mutate, data, isSuccess, isLoading };
 };
