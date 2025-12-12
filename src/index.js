@@ -2,11 +2,17 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import store from "./store/store";
 import { Provider } from "react-redux";
-import { QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { RouterProvider } from "react-router-dom";
 import { routes } from "./routes/routes";
 import { Toaster } from "sonner";
-import { queryClient } from "./App";
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    mutations: { retry: 2 },
+    queries: { retry: 2 },
+  },
+});
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

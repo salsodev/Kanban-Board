@@ -7,30 +7,12 @@ import SideBar from "./components/sidebar/SideBar";
 import Logo from "./components/Logo";
 
 import "./App.css";
-import { QueryClient } from "react-query";
-import { useIsLoggedIn } from "./api/hook/auth";
-import { useNavigate } from "react-router-dom";
-
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    mutations: { retry: 2 },
-    queries: { retry: 2 },
-  },
-});
 
 function App() {
-  const navigate = useNavigate();
   const [isNewTaskShow, setIsNewTaskShow] = useState(false);
   const theme = useSelector((state) => state.entities.ui.theme);
   const [isClickDroppable, setIsClickDroppable] = useState(false);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  const { data: isLoggedin } = useIsLoggedIn();
-
-  useEffect(() => {
-    if (!isLoggedin) {
-      navigate("/login");
-    }
-  }, [isLoggedin, navigate]);
 
   useEffect(() => {
     function handleScreenChange() {
@@ -46,17 +28,6 @@ function App() {
       window.removeEventListener("resize", handleScreenChange);
     };
   }, [screenWidth]);
-
-  if (!isLoggedin) {
-    return (
-      <div className="loaderContainer">
-        <div className="loaderWrapper">
-          <div className="loader"></div>
-          <p className="shimmer-text">Processing...</p>
-        </div>
-      </div>
-    ); // render nothing until auth is checked
-  }
 
   return (
     <div className="App" data-theme={theme && theme.isSwitch ? "light" : ""}>

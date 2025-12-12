@@ -7,7 +7,6 @@ function DragNdDrop() {
   return {
     todoDragStart: (e, id) => {
       e.preventDefault();
-      console.log(id);
       e.dataTransfer.setData("id", id);
     },
     todoDragOver: (e) => {
